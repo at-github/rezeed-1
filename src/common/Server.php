@@ -3,7 +3,7 @@ namespace Common;
 
 use Exception;
 
-class Server
+class Server implements ServerInterface
 {
     const SUB_DOMAIN = '/rezeed';
 
