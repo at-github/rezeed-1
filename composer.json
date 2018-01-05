@@ -1,0 +1,19 @@
+{
+    "name": "tarik/rezzed",
+    "description": "Technical test for deezer",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Common\\": "src/common"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tarik Amar",
+            "email": "tarik.amar@gmail.com"
+        }
+    ]
+}
