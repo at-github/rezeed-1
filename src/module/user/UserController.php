@@ -26,9 +26,8 @@ class UserController implements ControllerInterface
 
     public function getInfoFromId(int $id)
     {
-        //TODO get data from model
-        //how model is injected ?
+        $userInfo = $this->userModel->getInfoFromId($id);
 
-        return $this->response->json(200, ['id' => $id, 'name' => 'tarik', 'email' => 'tarik@e.mail']);
+        return $this->response->json(200, $userInfo);
     }
 }

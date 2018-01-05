@@ -3,6 +3,7 @@
 namespace Common;
 
 use Exception,
+    Module\User\UserModel,
     Module\User\UserController,
     Common\NotFoundController,
     Common\Response;
@@ -36,6 +37,7 @@ class Router
         ) {
             (new UserController())
                 ->setResponse($response)
+                ->setUserModel(new UserModel())
                 ->getInfoFromId($slugs[1]);
         } else {
             (new NotFoundController())

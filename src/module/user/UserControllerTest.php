@@ -2,7 +2,8 @@
 
 use PHPUnit\Framework\TestCase,
     Common\Response,
-    Module\User\UserController;
+    Module\User\UserController,
+    Module\User\UserModel;
 
 class UserControllerTest extends TestCase
 {
@@ -30,13 +31,21 @@ class UserControllerTest extends TestCase
 
     public function testGetInfoFromId()
     {
+        $userData = ['id' => 2, 'name' => 'tarik', 'email' => 'tarik@e.mail'];
+
         $responseMock = $this->createMock(Response::class);
         $responseMock->expects($this->once())
-                     ->method('json')
-                     ->with(200, ['id' => 2, 'name' => 'tarik', 'email' => 'tarik@e.mail']);
+                     ->method('json');
+
+        $modelMock = $this->createMock(UserModel::class);
+        $modelMock->expects($this->once())
+                     ->method('getInfoFromId')
+                     ->with(2)
+                     ->willReturn($userData);
 
         $response = self::$userController
                         ->setResponse($responseMock)
+                        ->setUserModel($modelMock)
                         ->getInfoFromId(2);
     }
 }
