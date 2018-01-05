@@ -2,9 +2,9 @@
 
 namespace Common;
 
-class Response
+class Response implements ResponseInterface
 {
-    static public function json(int $httpCode, string $message)
+    public function json(int $httpCode, string $message)
     {
         //Define message from status
         switch($httpCode) {

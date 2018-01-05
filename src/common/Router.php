@@ -4,7 +4,8 @@ namespace Common;
 
 use Exception,
     Module\User\UserController,
-    Common\NotFoundController;
+    Common\NotFoundController,
+    Common\Response;
 
 class Router
 {
@@ -26,6 +27,8 @@ class Router
         $uri    = $this->server->getUri();
         $method = $this->server->getMethod();
 
-        (new NotFoundController($uri))->response();
+        (new NotFoundController())
+            ->setResponse(new Response())
+            ->response();
     }
 }
