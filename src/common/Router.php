@@ -26,9 +26,21 @@ class Router
     {
         $uri    = $this->server->getUri();
         $method = $this->server->getMethod();
+        $response = new Response();
 
-        (new NotFoundController())
-            ->setResponse(new Response())
-            ->response();
+        // user queries
+        // route: GET /user/:id
+        if (
+            $method === self::METHOD_GET &&
+            preg_match('/^\/user\/(\d+)$/', $uri, $slugs)
+        ) {
+            (new UserController())
+                ->setResponse($response)
+                ->getInfoFromId($slugs[1]);
+        } else {
+            (new NotFoundController())
+                ->setResponse($response)
+                ->response();
+        }
     }
 }

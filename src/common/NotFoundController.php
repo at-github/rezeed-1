@@ -3,11 +3,12 @@
 namespace Common;
 
 use Common\Response,
-    Common\ResponseInterface;
+    Common\ResponseInterface,
+    Common\ControllerInterface;
 
-class NotFoundController
+class NotFoundController implements ControllerInterface
 {
-    public function setResponse(ResponseInterface $response): self
+    public function setResponse(ResponseInterface $response): ControllerInterface
     {
         $this->response = $response;
         return $this;
