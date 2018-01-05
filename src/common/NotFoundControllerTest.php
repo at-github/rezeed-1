@@ -20,7 +20,7 @@ class NotFoundControllerTest extends TestCase
 
         $responseMock->expects($this->once())
                      ->method('json')
-                     ->with(404, 'Route doesn\'t exist');
+                     ->with(404, ['message' => 'Route doesn\'t exist']);
 
         $response = (new NotFoundController())
             ->setResponse($responseMock)

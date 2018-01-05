@@ -4,7 +4,7 @@ namespace Common;
 
 class Response implements ResponseInterface
 {
-    public function json(int $httpCode, string $message)
+    public function json(int $httpCode, array $body)
     {
         //Define message from status
         switch($httpCode) {
@@ -20,7 +20,7 @@ class Response implements ResponseInterface
         header('Content-Type: application/json');
 
         echo json_encode(
-            compact('message'),
+            $body,
             true
         );
     }

@@ -15,6 +15,6 @@ class NotFoundController
 
     public function response()
     {
-        return $this->response->json(404, 'Route doesn\'t exist');
+        return $this->response->json(404, ["message" => 'Route doesn\'t exist']);
     }
 }

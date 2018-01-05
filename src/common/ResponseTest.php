@@ -14,10 +14,10 @@ class ResponseTest extends TestCase
      * @dataProvider jsonProvider
      * @runInSeparateProcess because json method use header
      */
-    public function testJson($expect, $status, $message)
+    public function testJson($expect, $status, $body)
     {
         ob_start();
-        Response::json($status, $message);
+        Response::json($status, $body);
         $output = ob_get_clean();
 
         $this->assertSame($expect, $output);
@@ -25,8 +25,8 @@ class ResponseTest extends TestCase
 
     public function jsonProvider(){
         return [
-            404 => ['{"message":"not found"}', 404, 'not found'],
-            200 => ['{"message":"fine"}',      200, 'fine']
+            404 => ['{"message":"not found"}', 404, ['message' => 'not found']],
+            200 => ['{"message":"fine"}',      200, ['message' => 'fine']]
         ];
     }
 }

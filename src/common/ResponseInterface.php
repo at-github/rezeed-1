@@ -9,5 +9,5 @@ namespace Common;
  * @author Tarik
  */
 interface ResponseInterface {
-    public function json(int $httpCode, string $message);
+    public function json(int $httpCode, array $body);
 }
