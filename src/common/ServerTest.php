@@ -65,4 +65,17 @@ class ServerTest extends TestCase
             ['GET'], ['POST'], ['DELETE']
         ];
     }
+
+    public function testGetPost()
+    {
+        $_POST = ['foo', 'bar'];
+        $server = new Server();
+
+        $this->assertEquals(['foo', 'bar'], $server->getPost());
+    }
+
+    public function testGetDelete()
+    {
+        $this->markTestSkipped('Unable to fake server (to fill php://input)');
+    }
 }

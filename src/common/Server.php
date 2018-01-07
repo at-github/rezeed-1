@@ -10,6 +10,7 @@ class Server implements ServerInterface
     private $uri;
     private $method;
     private $post;
+    private $delete;
 
     public function __construct()
     {
@@ -25,9 +26,11 @@ class Server implements ServerInterface
         );
         $this->method = $_SERVER['REQUEST_METHOD'];
 
-        if (isset($_POST)){
+        if (isset($_POST))
             $this->post = $_POST;
-        }
+
+        if ($this->getMethod() === 'DELETE')
+            parse_str(file_get_contents('php://input'), $this->delete);
     }
 
     public function getUri(): string
@@ -43,5 +46,10 @@ class Server implements ServerInterface
     public function getPost(): array
     {
         return $this->post;
+    }
+
+    public function getDelete(): array
+    {
+        return $this->delete;
     }
 }

@@ -87,6 +87,18 @@ class Router
                 ->setUserModel(new UserModel($pdo))
                 ->setSongModel(new SongModel($pdo))
                 ->addSong($this->server->getPost());
+        // route: DELETE /favorite/song/:id
+        // body user_id song_id
+        } else if (
+            $method === self::METHOD_DELETE &&
+            preg_match('/^\/favorite$/', $uri, $slugs)
+        ) {
+            (new FavoriteController())
+                ->setResponse($response)
+                ->setFavoriteModel(new FavoriteModel($pdo))
+                ->setUserModel(new UserModel($pdo))
+                ->setSongModel(new SongModel($pdo))
+                ->deleteSong($this->server->getDelete());
         // 404
         } else {
             (new NotFoundController())

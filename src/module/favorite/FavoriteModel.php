@@ -74,6 +74,40 @@ class FavoriteModel
             $this->db->query($queryInsert);
         } catch (Exception $e){
             throw new RuntimeException(
+                // TODO const
+                'Unable to execute query',
+                intval($e->getCode(), 10),
+                $e
+            );
+        }
+
+        return $this->getFavoriteSongFromUserId($userId);
+    }
+
+    public function deleteSong(int $userId, int $songId)
+    {
+        $querySelect = 'SELECT count(*) FROM ' . self::TABLE_NAME . " WHERE user_id = $userId AND song_id = $songId;";
+
+        try {
+            $result = $this->db->query($querySelect);
+        } catch (Exception $e){
+            throw new RuntimeException(
+                'Unable to execute query',
+                intval($e->getCode(), 10),
+                $e
+            );
+        }
+
+        $resultFetched = intval($result->fetch(PDO::FETCH_COLUMN));
+        if ($resultFetched === 0)
+            throw new Exception("no song with id: $songId in favorite of user: $userId");
+
+        $queryDelete = 'DELETE FROM ' . self::TABLE_NAME . " WHERE user_id = $userId AND song_id = $songId;";
+
+        try {
+            $this->db->query($queryDelete);
+        } catch (Exception $e){
+            throw new RuntimeException(
                 'Unable to execute query',
                 intval($e->getCode(), 10),
                 $e

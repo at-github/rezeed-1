@@ -143,4 +143,77 @@ class FavoriteController implements ControllerInterface
             $favoriteInfo
         );
     }
+
+    public function deleteSong($delete)
+    {
+        if (!isset($delete['user_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'user_id is missing']
+            );
+
+        if (!preg_match('/^\d*$/', $delete['user_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'user_id must be digit']
+            );
+
+        if (!isset($delete['song_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'song_id is missing']
+            );
+
+        if (!preg_match('/^\d*$/', $delete['song_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'song_id must be digit']
+            );
+
+        $userId = intval($delete['user_id'], 10);
+        $songId = intval($delete['song_id'], 10);
+
+        //user exist ?
+        if (is_null($this->userModel->getInfoFromId($userId)))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => "user with id: $userId doesn't exist"]
+            );
+
+        //song exist ?
+        if (is_null($this->songModel->getInfoFromId($songId)))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => "song with id: $songId doesn't exist"]
+            );
+
+        try {
+            $favoriteInfo = $this->favoriteModel->deleteSong($userId, $songId);
+        } catch (RuntimeException $e){
+            return $this->response->json(
+                self::STATUS_CODE_INTERNAL_ERROR,
+                [
+                    'message' => $e->getMessage()
+                ]
+            );
+        } catch (Exception $e){
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                [
+                    'message' => $e->getMessage()
+                ]
+            );
+        }
+
+        if (is_null($favoriteInfo))
+            return $this->response->json(
+                self::STATUS_CODE_RESSOURCE_NOT_FOUND,
+                ['message' => "no favorite for user id: $userId"]
+            );
+
+        return $this->response->json(
+            self::STATUS_CODE_OK,
+            $favoriteInfo
+        );
+    }
 }
