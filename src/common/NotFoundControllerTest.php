@@ -1,8 +1,10 @@
 <?php
 
-use PHPUnit\Framework\TestCase,
-    Common\NotFoundController,
-    Common\Response;
+use PHPUnit\Framework\TestCase;
+use Common\{
+    NotFoundController,
+    Response
+};
 
 class NotFoundControllerTest extends TestCase
 {

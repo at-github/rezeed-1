@@ -1,9 +1,11 @@
 <?php
 
 use PHPUnit\Framework\TestCase,
-    Common\Response,
-    Module\User\UserController,
-    Module\User\UserModel;
+    Common\Response;
+use Module\{
+    User\UserController,
+    User\UserModel
+};
 
 class UserControllerTest extends TestCase
 {

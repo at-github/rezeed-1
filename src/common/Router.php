@@ -2,11 +2,15 @@
 
 namespace Common;
 
-use Exception,
-    Module\User\UserModel,
-    Module\User\UserController,
-    Common\NotFoundController,
-    Common\Response;
+use Exception;
+use Module\{
+    User\UserModel,
+    User\UserController
+};
+use Common\{
+    NotFoundController,
+    Response
+};
 
 class Router
 {

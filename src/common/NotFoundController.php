@@ -2,9 +2,11 @@
 
 namespace Common;
 
-use Common\Response,
-    Common\ResponseInterface,
-    Common\ControllerInterface;
+use Common\{
+    Response,
+    ResponseInterface,
+    ControllerInterface
+};
 
 class NotFoundController implements ControllerInterface
 {
