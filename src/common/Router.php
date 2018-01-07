@@ -11,7 +11,9 @@ use Module\{
     User\UserModel,
     User\UserController,
     Song\SongController,
-    Song\SongModel
+    Song\SongModel,
+    Favorite\FavoriteController,
+    Favorite\FavoriteModel
 };
 
 class Router
@@ -62,6 +64,15 @@ class Router
             (new SongController())
                 ->setResponse($response)
                 ->setSongModel(new SongModel($pdo))
+                ->getInfoFromId($slugs[1]);
+        // route: GET /favorite/user/:id
+        } else if (
+            $method === self::METHOD_GET &&
+            preg_match('/^\/favorite\/user\/(\d+)$/', $uri, $slugs)
+        ) {
+            (new FavoriteController())
+                ->setResponse($response)
+                ->setFavoriteModel(new FavoriteModel($pdo))
                 ->getInfoFromId($slugs[1]);
         // 404
         } else {

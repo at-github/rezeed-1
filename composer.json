@@ -9,7 +9,8 @@
         "psr-4": {
             "Common\\": "src/common",
             "Module\\User\\": "src/module/user",
-            "Module\\Song\\": "src/module/song"
+            "Module\\Song\\": "src/module/song",
+            "Module\\Favorite\\": "src/module/favorite"
         }
     },
     "authors": [
