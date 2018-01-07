@@ -3,13 +3,15 @@
 namespace Common;
 
 use Exception;
-use Module\{
-    User\UserModel,
-    User\UserController
-};
 use Common\{
     NotFoundController,
     Response
+};
+use Module\{
+    User\UserModel,
+    User\UserController,
+    Song\SongController,
+    Song\SongModel
 };
 
 class Router
@@ -43,7 +45,6 @@ class Router
             die();
         }
 
-        // user queries
         // route: GET /user/:id
         if (
             $method === self::METHOD_GET &&
@@ -53,6 +54,16 @@ class Router
                 ->setResponse($response)
                 ->setUserModel(new UserModel($pdo))
                 ->getInfoFromId($slugs[1]);
+        // route: GET /song/:id
+        } else if (
+            $method === self::METHOD_GET &&
+            preg_match('/^\/song\/(\d+)$/', $uri, $slugs)
+        ) {
+            (new SongController())
+                ->setResponse($response)
+                ->setSongModel(new SongModel($pdo))
+                ->getInfoFromId($slugs[1]);
+        // 404
         } else {
             (new NotFoundController())
                 ->setResponse($response)

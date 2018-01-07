@@ -1,14 +1,14 @@
 <?php
 
-namespace Module\User;
+namespace Module\Song;
 
 use Exception,
     RuntimeException,
     PDO;
 
-class UserModel
+class SongModel
 {
-    const TABLE_NAME = 'user';
+    const TABLE_NAME = 'song';
 
     private $db;
 
@@ -21,7 +21,7 @@ class UserModel
     {
         $id = intval($id, 10);
 
-        $query = 'SELECT id, name, email FROM ' . self::TABLE_NAME . " WHERE id=$id;";
+        $query = 'SELECT id, title, duration FROM ' . self::TABLE_NAME . " WHERE id=$id;";
 
         try {
             $result = $this->db->query($query);
@@ -39,9 +39,9 @@ class UserModel
             return null;
 
         return [
-            'id'    => $resultFetched->id,
-            'name'  => $resultFetched->name,
-            'email' => $resultFetched->email
+            'id'       => $resultFetched->id,
+            'title'    => $resultFetched->title,
+            'duration' => $resultFetched->duration
         ];
     }
 }

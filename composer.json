@@ -8,7 +8,8 @@
     "autoload": {
         "psr-4": {
             "Common\\": "src/common",
-            "Module\\User\\": "src/module/user"
+            "Module\\User\\": "src/module/user",
+            "Module\\Song\\": "src/module/song"
         }
     },
     "authors": [
