@@ -2,6 +2,7 @@
 
 namespace Module\User;
 
+use RuntimeException;
 use Common\{
         ResponseInterface,
         ControllerInterface
@@ -26,8 +27,26 @@ class UserController implements ControllerInterface
 
     public function getInfoFromId(int $id)
     {
-        $userInfo = $this->userModel->getInfoFromId($id);
+        try {
+            $userInfo = $this->userModel->getInfoFromId($id);;
+        } catch (RuntimeException $e){
+            return $this->response->json(
+                self::STATUS_CODE_INTERNAL_ERROR,
+                [
+                    'message' => $e->getMessage()
+                ]
+            );
+        }
 
-        return $this->response->json(200, $userInfo);
+        if (is_null($userInfo))
+            return $this->response->json(
+                self::STATUS_CODE_RESSOURCE_NOT_FOUND,
+                ['message' => "no user with id: $id"]
+            );
+
+        return $this->response->json(
+            self::STATUS_CODE_OK,
+            $userInfo
+        );
     }
 }

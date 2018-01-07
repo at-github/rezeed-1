@@ -3,7 +3,6 @@
 namespace Common;
 
 use Common\{
-    Response,
     ResponseInterface,
     ControllerInterface
 };
@@ -18,6 +17,9 @@ class NotFoundController implements ControllerInterface
 
     public function response()
     {
-        return $this->response->json(404, ["message" => 'Route doesn\'t exist']);
+        return $this->response->json(
+            self::STATUS_CODE_RESSOURCE_NOT_FOUND,
+            ["message" => 'Route doesn\'t exist']
+        );
     }
 }
