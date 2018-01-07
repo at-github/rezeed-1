@@ -35,6 +35,7 @@ class Router
     {
         $uri      = $this->server->getUri();
         $method   = $this->server->getMethod();
+        $post     = $this->server->getPost();
         $response = new Response();
 
         try {
@@ -74,6 +75,18 @@ class Router
                 ->setResponse($response)
                 ->setFavoriteModel(new FavoriteModel($pdo))
                 ->getInfoFromId($slugs[1]);
+        // route: POST /favorite/
+        // body user_id song_id
+        } else if (
+            $method === self::METHOD_POST &&
+            preg_match('/^\/favorite$/', $uri, $slugs)
+        ) {
+            (new FavoriteController())
+                ->setResponse($response)
+                ->setFavoriteModel(new FavoriteModel($pdo))
+                ->setUserModel(new UserModel($pdo))
+                ->setSongModel(new SongModel($pdo))
+                ->addSong($this->server->getPost());
         // 404
         } else {
             (new NotFoundController())

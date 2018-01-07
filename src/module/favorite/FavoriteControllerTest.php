@@ -4,7 +4,9 @@ use PHPUnit\Framework\TestCase,
     Common\Response;
 use Module\{
     Favorite\FavoriteController,
-    Favorite\FavoriteModel
+    Favorite\FavoriteModel,
+    User\UserModel,
+    Song\SongModel
 };
 
 class FavoriteControllerTest extends TestCase
@@ -31,6 +33,19 @@ class FavoriteControllerTest extends TestCase
         $this->assertInstanceOf(FavoriteController::class, $setResponseReturn);
     }
 
+    public function testSetUserModel()
+    {
+        $setUserModelReturn = (new FavoriteController())->setUserModel(null);
+
+        $this->assertInstanceOf(FavoriteController::class, $setUserModelReturn);
+    }
+
+    public function testSetSongModel()
+    {
+        $setSongModelReturn = (new FavoriteController())->setSongModel(null);
+
+        $this->assertInstanceOf(FavoriteController::class, $setSongModelReturn);
+    }
     /**
      * @dataProvider convertTimeForHumanProvider
      */
@@ -109,5 +124,183 @@ class FavoriteControllerTest extends TestCase
             ->setResponse($responseMock)
             ->setFavoriteModel($modelMock)
             ->getInfoFromId(2);
+    }
+
+    /**
+     * @dataProvider addSongProvider
+     */
+    public function testAddSongWrongParam($expectCode, $expectMessage, $post)
+    {
+
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with($expectCode, $expectMessage);
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->addSong($post);
+    }
+
+    public function addSongProvider()
+    {
+        return [
+            [422, ['message' => 'user_id is missing'],    []],
+            [422, ['message' => 'user_id must be digit'], ['user_id' => 'foo']],
+            [422, ['message' => 'song_id is missing'],    ['user_id' => '2']],
+            [422, ['message' => 'song_id must be digit'], ['song_id' => 'foo', 'user_id' => '2']],
+        ];
+    }
+
+    public function testAddSongUserNotFound()
+    {
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with(422,[ 'message' => 'user with id: 2 doesn\'t exist']);
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->expects($this->once())
+                     ->method('getInfoFromId')
+                     ->with('2')
+                     ->willReturn(null);
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->setUserModel($userModelMock)
+            ->addSong([
+                'song_id' => '3', 'user_id' => '2'
+            ]);
+    }
+
+    public function testAddSongSongNotFound()
+    {
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with(422,[ 'message' => 'song with id: 3 doesn\'t exist']);
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->expects($this->once())
+                      ->method('getInfoFromId')
+                      ->with('2')
+                      ->willReturn(true);
+
+
+        $songModelMock = $this->createMock(SongModel::class);
+        $songModelMock->expects($this->once())
+                      ->method('getInfoFromId')
+                      ->with('3')
+                      ->willReturn(null);
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->setUserModel($userModelMock)
+            ->setSongModel($songModelMock)
+            ->addSong([
+                'song_id' => '3', 'user_id' => '2'
+            ]);
+    }
+
+    public function testAddSongRunTimeRuntimeException()
+    {
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with(500,[ 'message' => 'error from model']);
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+
+        $songModelMock = $this->createMock(SongModel::class);
+        $songModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+        $favoriteModelMock = $this->createMock(FavoriteModel::class);
+        $favoriteModelMock->expects($this->once())
+                          ->method('addSong')
+                          ->with(2, 3)
+                          ->will(
+                              $this->throwException(new RuntimeException('error from model'))
+                          );
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->setUserModel($userModelMock)
+            ->setSongModel($songModelMock)
+            ->setFavoriteModel($favoriteModelMock)
+            ->addSong([
+                'song_id' => '3', 'user_id' => '2'
+            ]);
+    }
+
+    public function testAddSongRunTimeException()
+    {
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with(422,[ 'message' => 'error from model']);
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+
+        $songModelMock = $this->createMock(SongModel::class);
+        $songModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+        $favoriteModelMock = $this->createMock(FavoriteModel::class);
+        $favoriteModelMock->expects($this->once())
+                          ->method('addSong')
+                          ->with(2, 3)
+                          ->will(
+                              $this->throwException(new Exception('error from model'))
+                          );
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->setUserModel($userModelMock)
+            ->setSongModel($songModelMock)
+            ->setFavoriteModel($favoriteModelMock)
+            ->addSong([
+                'song_id' => '3', 'user_id' => '2'
+            ]);
+    }
+
+    public function testAddSongSuccess()
+    {
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with(201,['foo', 'bar']);
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+
+        $songModelMock = $this->createMock(SongModel::class);
+        $songModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+        $favoriteModelMock = $this->createMock(FavoriteModel::class);
+        $favoriteModelMock->expects($this->once())
+                          ->method('addSong')
+                          ->with(2, 3)
+                          ->willReturn(
+                              ['foo', 'bar']
+                          );
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->setUserModel($userModelMock)
+            ->setSongModel($songModelMock)
+            ->setFavoriteModel($favoriteModelMock)
+            ->addSong([
+                'song_id' => '3', 'user_id' => '2'
+            ]);
     }
 }

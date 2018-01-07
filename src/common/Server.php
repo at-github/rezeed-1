@@ -9,6 +9,7 @@ class Server implements ServerInterface
 
     private $uri;
     private $method;
+    private $post;
 
     public function __construct()
     {
@@ -23,6 +24,10 @@ class Server implements ServerInterface
             $_SERVER['REQUEST_URI']
         );
         $this->method = $_SERVER['REQUEST_METHOD'];
+
+        if (isset($_POST)){
+            $this->post = $_POST;
+        }
     }
 
     public function getUri(): string
@@ -33,5 +38,10 @@ class Server implements ServerInterface
     public function getMethod(): string
     {
         return $this->method;
+    }
+
+    public function getPost(): array
+    {
+        return $this->post;
     }
 }

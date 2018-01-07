@@ -2,16 +2,23 @@
 
 namespace Module\Favorite;
 
-use RuntimeException;
+use Exception,
+    RuntimeException;
 use Common\{
         ResponseInterface,
         ControllerInterface
     };
+use Module\{
+        UserModel,
+        SongModel
+};
 
 class FavoriteController implements ControllerInterface
 {
     private $response;
     private $favoriteModel;
+    private $userModel;
+    private $songModel;
 
     public function setResponse(ResponseInterface $response): ControllerInterface
     {
@@ -36,7 +43,7 @@ class FavoriteController implements ControllerInterface
     public function getInfoFromId(int $id)
     {
         try {
-            $favoriteInfo = $this->favoriteModel->getFavoriteSongFromUserId($id);;
+            $favoriteInfo = $this->favoriteModel->getFavoriteSongFromUserId($id);
         } catch (RuntimeException $e){
             return $this->response->json(
                 self::STATUS_CODE_INTERNAL_ERROR,
@@ -54,6 +61,85 @@ class FavoriteController implements ControllerInterface
 
         return $this->response->json(
             self::STATUS_CODE_OK,
+            $favoriteInfo
+        );
+    }
+
+    public function setUserModel($userModel): ControllerInterface
+    {
+        $this->userModel = $userModel;
+        return $this;
+    }
+
+    public function setSongModel($songModel): ControllerInterface
+    {
+        $this->songModel = $songModel;
+        return $this;
+    }
+
+    public function addSong(array $post)
+    {
+        if (!isset($post['user_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'user_id is missing']
+            );
+
+        if (!preg_match('/^\d*$/', $post['user_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'user_id must be digit']
+            );
+
+        if (!isset($post['song_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'song_id is missing']
+            );
+
+        if (!preg_match('/^\d*$/', $post['song_id']))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => 'song_id must be digit']
+            );
+
+        $userId = intval($post['user_id'], 10);
+        $songId = intval($post['song_id'], 10);
+
+        //user exist ?
+        if (is_null($this->userModel->getInfoFromId($userId)))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => "user with id: $userId doesn't exist"]
+            );
+
+        //song exist ?
+        if (is_null($this->songModel->getInfoFromId($songId)))
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                ['message' => "song with id: $songId doesn't exist"]
+            );
+
+        try {
+            $favoriteInfo = $this->favoriteModel->addSong($userId, $songId);
+        } catch (RuntimeException $e){
+            return $this->response->json(
+                self::STATUS_CODE_INTERNAL_ERROR,
+                [
+                    'message' => $e->getMessage()
+                ]
+            );
+        } catch (Exception $e){
+            return $this->response->json(
+                self::STATUS_CODE_UNPROCESSABLE,
+                [
+                    'message' => $e->getMessage()
+                ]
+            );
+        }
+
+        return $this->response->json(
+            self::STATUS_CODE_CREATED,
             $favoriteInfo
         );
     }

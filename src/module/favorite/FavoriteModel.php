@@ -21,11 +21,12 @@ class FavoriteModel
     {
         $id = intval($id, 10);
 
-        // SELECT title FROM song
-        //   INNER JOIN favorite_song ON song.id = favorite_song.song_id
-        //   INNER JOIN user ON user.id = favorite_song.user_id
-        //   WHERE user.id = 1;`
-        $query = 'SELECT title FROM ' . \Module\Song\SongModel::TABLE_NAME
+        /** SELECT title FROM song
+         *      INNER JOIN favorite_song ON song.id = favorite_song.song_id
+         *      INNER JOIN user ON user.id = favorite_song.user_id
+         *   WHERE user.id = 1;
+         */
+        $query = 'SELECT song.id, song.title FROM ' . \Module\Song\SongModel::TABLE_NAME
                 . ' INNER JOIN ' . self::TABLE_NAME
                     . ' ON ' . \Module\Song\SongModel::TABLE_NAME . '.id = ' . self::TABLE_NAME . '.song_id'
                 . ' INNER JOIN ' . \Module\User\UserModel::TABLE_NAME
@@ -42,11 +43,43 @@ class FavoriteModel
             );
         }
 
-        $resultFetched = $result->fetchAll(PDO::FETCH_OBJ); //?
+        $resultFetched = $result->fetchAll(PDO::FETCH_OBJ);
 
         if (empty($resultFetched))
             return null;
 
         return $resultFetched;
+    }
+
+    public function addSong(int $userId, int $songId)
+    {
+        // Already in favorites user ?
+        $querySelect = 'SELECT count(*) FROM ' . self::TABLE_NAME . " WHERE user_id = $userId AND song_id = $songId;";
+        try {
+            $resultFetched = $this->db->query($querySelect)
+                                      ->fetch(PDO::FETCH_COLUMN);
+        } catch (Exception $e){
+            throw new RuntimeException(
+                'Unable to execute query',
+                intval($e->getCode(), 10),
+                $e
+            );
+        }
+
+        if ($resultFetched != 0)
+            throw new Exception("song with id: $songId already in favorite of user: $userId");
+
+        try {
+            $queryInsert = 'INSERT INTO ' . self::TABLE_NAME . " (user_id, song_id) VALUES ($userId, $songId)";
+            $this->db->query($queryInsert);
+        } catch (Exception $e){
+            throw new RuntimeException(
+                'Unable to execute query',
+                intval($e->getCode(), 10),
+                $e
+            );
+        }
+
+        return $this->getFavoriteSongFromUserId($userId);
     }
 }
