@@ -51,9 +51,8 @@ class FavoriteModel
         return $resultFetched;
     }
 
-    public function addSong(int $userId, int $songId)
+    public function isAlreadyFavorite(int $userId, int $songId)
     {
-        // Already in favorites user ?
         $querySelect = 'SELECT count(*) FROM ' . self::TABLE_NAME . " WHERE user_id = $userId AND song_id = $songId;";
         try {
             $resultFetched = $this->db->query($querySelect)
@@ -65,6 +64,13 @@ class FavoriteModel
                 $e
             );
         }
+
+        return intval($resultFetched, 10);
+    }
+
+    public function addSong(int $userId, int $songId)
+    {
+        $resultFetched = $this->isAlreadyFavorite($userId, $songId);
 
         if ($resultFetched != 0)
             throw new Exception("song with id: $songId already in favorite of user: $userId");
@@ -86,19 +92,8 @@ class FavoriteModel
 
     public function deleteSong(int $userId, int $songId)
     {
-        $querySelect = 'SELECT count(*) FROM ' . self::TABLE_NAME . " WHERE user_id = $userId AND song_id = $songId;";
+        $resultFetched = $this->isAlreadyFavorite($userId, $songId);
 
-        try {
-            $result = $this->db->query($querySelect);
-        } catch (Exception $e){
-            throw new RuntimeException(
-                'Unable to execute query',
-                intval($e->getCode(), 10),
-                $e
-            );
-        }
-
-        $resultFetched = intval($result->fetch(PDO::FETCH_COLUMN));
         if ($resultFetched === 0)
             throw new Exception("no song with id: $songId in favorite of user: $userId");
 

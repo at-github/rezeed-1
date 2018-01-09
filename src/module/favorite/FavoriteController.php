@@ -77,31 +77,43 @@ class FavoriteController implements ControllerInterface
         return $this;
     }
 
+    private function checkUserIdSongId(array $params)
+    {
+        if (!isset($params['user_id']))
+            throw new Exception(
+                'user_id is missing',
+                self::STATUS_CODE_UNPROCESSABLE
+            );
+
+        if (!preg_match('/^\d*$/', $params['user_id']))
+            throw new Exception(
+                'user_id must be digit',
+                self::STATUS_CODE_UNPROCESSABLE
+            );
+
+        if (!isset($params['song_id']))
+            throw new Exception(
+                'song_id is missing',
+                self::STATUS_CODE_UNPROCESSABLE
+            );
+
+        if (!preg_match('/^\d*$/', $params['song_id']))
+            throw new Exception(
+                'song_id must be digit',
+                self::STATUS_CODE_UNPROCESSABLE
+            );
+    }
+
     public function addSong(array $post)
     {
-        if (!isset($post['user_id']))
+        try {
+            $this->checkUserIdSongId($post);;
+        } catch (Exception $e){
             return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'user_id is missing']
+                $e->getCode(),
+                ['message' => $e->getMessage()]
             );
-
-        if (!preg_match('/^\d*$/', $post['user_id']))
-            return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'user_id must be digit']
-            );
-
-        if (!isset($post['song_id']))
-            return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'song_id is missing']
-            );
-
-        if (!preg_match('/^\d*$/', $post['song_id']))
-            return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'song_id must be digit']
-            );
+        }
 
         $userId = intval($post['user_id'], 10);
         $songId = intval($post['song_id'], 10);
@@ -146,29 +158,14 @@ class FavoriteController implements ControllerInterface
 
     public function deleteSong($delete)
     {
-        if (!isset($delete['user_id']))
+        try {
+            $this->checkUserIdSongId($delete);;
+        } catch (Exception $e){
             return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'user_id is missing']
+                $e->getCode(),
+                ['message' => $e->getMessage()]
             );
-
-        if (!preg_match('/^\d*$/', $delete['user_id']))
-            return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'user_id must be digit']
-            );
-
-        if (!isset($delete['song_id']))
-            return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'song_id is missing']
-            );
-
-        if (!preg_match('/^\d*$/', $delete['song_id']))
-            return $this->response->json(
-                self::STATUS_CODE_UNPROCESSABLE,
-                ['message' => 'song_id must be digit']
-            );
+        }
 
         $userId = intval($delete['user_id'], 10);
         $songId = intval($delete['song_id'], 10);
