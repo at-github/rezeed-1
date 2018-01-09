@@ -481,4 +481,35 @@ class FavoriteControllerTest extends TestCase
                 'song_id' => '3', 'user_id' => '2'
             ]);
     }
+
+    public function testDeleteSongSuccessFavoriteEmpty()
+    {
+        $responseMock = $this->createMock(Response::class);
+        $responseMock->expects($this->once())
+                     ->method('json')
+                     ->with(404, ['message' => 'no favorite for user id: 2']);
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+
+        $songModelMock = $this->createMock(SongModel::class);
+        $songModelMock->method('getInfoFromId')
+                      ->willReturn(true);
+
+        $favoriteModelMock = $this->createMock(FavoriteModel::class);
+        $favoriteModelMock->expects($this->once())
+                          ->method('deleteSong')
+                          ->with(2, 3);
+
+        self::$favoriteController
+            ->setResponse($responseMock)
+            ->setUserModel($userModelMock)
+            ->setSongModel($songModelMock)
+            ->setFavoriteModel($favoriteModelMock)
+            ->deleteSong([
+                'song_id' => '3', 'user_id' => '2'
+            ]);
+    }
 }

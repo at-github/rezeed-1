@@ -153,4 +153,92 @@ class FavoriteModelTest extends TestCase
 
         (new FavoriteModel($pdoMock))->addSong($userId, $songId);
     }
+
+    public function testDeleteSongCheckAlreadyExistFail()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to execute query');
+
+        $userId = 11;
+        $songId = 22;
+
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->expects($this->once())
+                ->method('query')
+                ->with('SELECT count(*) FROM favorite_song WHERE user_id = 11 AND song_id = 22;')
+                ->will($this->throwException(new Exception));
+
+        (new FavoriteModel($pdoMock))->deleteSong($userId, $songId);
+    }
+
+    public function testDeleteSongAlreadyExist()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('no song with id: 22 in favorite of user: 11');
+
+        $userId = 11;
+        $songId = 22;
+
+        $pdoStatementMock = $this->createMock(PDOStatement::class);
+
+        $pdoMock = $this->createMock(PDO::class);
+        $pdoMock->expects($this->once())
+                ->method('query')
+                ->willReturn($pdoStatementMock);
+
+        (new FavoriteModel($pdoMock))->deleteSong($userId, $songId);
+    }
+
+    public function testDeleteSongDeleteFail()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unable to execute query');
+
+        $userId = 11;
+        $songId = 22;
+
+        $pdoStatementMock = $this->createMock(PDOStatement::class);
+        $pdoMock          = $this->createMock(PDO::class);
+
+        $pdoMock->expects($this->at(0))             // already in favorite
+                ->method('query')
+                ->willReturn($pdoStatementMock);
+
+        $pdoStatementMock->expects($this->at(0))    // is it
+                ->method('fetch')
+                ->willReturn(1);
+
+        $pdoMock->expects($this->at(1))             // delete fail
+                ->method('query')
+                ->will($this->throwException(new Exception));
+
+        (new FavoriteModel($pdoMock))->deleteSong($userId, $songId);
+    }
+
+    public function testDeleteSongDeleteSuccess()
+    {
+        $userId = 11;
+        $songId = 22;
+
+        $pdoStatementMock = $this->createMock(PDOStatement::class);
+        $pdoMock          = $this->createMock(PDO::class);
+
+        $pdoMock->expects($this->at(0))          // in favorite ?
+                ->method('query')
+                ->willReturn($pdoStatementMock);
+
+        $pdoStatementMock->expects($this->at(0)) // in favorite suite ?
+                ->method('fetch')
+                ->with(PDO::FETCH_COLUMN)
+                ->willReturn(2);                 // is it in favorite !
+
+        $pdoMock->expects($this->at(1))          // delete
+                ->method('query');
+
+        $pdoMock->expects($this->at(2))          // get list
+                ->method('query')
+                ->willReturn($pdoStatementMock);
+
+        (new FavoriteModel($pdoMock))->deleteSong($userId, $songId);
+    }
 }
