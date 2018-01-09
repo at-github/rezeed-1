@@ -4,9 +4,10 @@ namespace Module\User;
 
 use Exception,
     RuntimeException,
+    Common\ModelInterface,
     PDO;
 
-class UserModel
+class UserModel implements ModelInterface
 {
     const TABLE_NAME = 'user';
 
@@ -27,7 +28,7 @@ class UserModel
             $result = $this->db->query($query);
         } catch (Exception $e){
             throw new RuntimeException(
-                'Unable to execute query',
+                self::QUERY_KO,
                 intval($e->getCode(), 10),
                 $e
             );

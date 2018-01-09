@@ -4,9 +4,10 @@ namespace Module\Favorite;
 
 use Exception,
     RuntimeException,
+    Common\ModelInterface,
     PDO;
 
-class FavoriteModel
+class FavoriteModel implements ModelInterface
 {
     const TABLE_NAME = 'favorite_song';
 
@@ -37,7 +38,7 @@ class FavoriteModel
             $result = $this->db->query($query);
         } catch (Exception $e){
             throw new RuntimeException(
-                'Unable to execute query',
+                self::QUERY_KO,
                 intval($e->getCode(), 10),
                 $e
             );
@@ -59,7 +60,7 @@ class FavoriteModel
                                       ->fetch(PDO::FETCH_COLUMN);
         } catch (Exception $e){
             throw new RuntimeException(
-                'Unable to execute query',
+                self::QUERY_KO,
                 intval($e->getCode(), 10),
                 $e
             );
@@ -80,8 +81,7 @@ class FavoriteModel
             $this->db->query($queryInsert);
         } catch (Exception $e){
             throw new RuntimeException(
-                // TODO const
-                'Unable to execute query',
+                self::QUERY_KO,
                 intval($e->getCode(), 10),
                 $e
             );
@@ -103,7 +103,7 @@ class FavoriteModel
             $this->db->query($queryDelete);
         } catch (Exception $e){
             throw new RuntimeException(
-                'Unable to execute query',
+                self::QUERY_KO,
                 intval($e->getCode(), 10),
                 $e
             );

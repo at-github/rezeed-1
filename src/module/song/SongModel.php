@@ -4,9 +4,10 @@ namespace Module\Song;
 
 use Exception,
     RuntimeException,
+    Common\ModelInterface,
     PDO;
 
-class SongModel
+class SongModel implements ModelInterface
 {
     const TABLE_NAME = 'song';
 
@@ -27,7 +28,7 @@ class SongModel
             $result = $this->db->query($query);
         } catch (Exception $e){
             throw new RuntimeException(
-                'Unable to execute query',
+                self::QUERY_KO,
                 intval($e->getCode(), 10),
                 $e
             );
